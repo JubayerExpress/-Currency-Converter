@@ -1,23 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Currency Converter</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Currency Converter</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Currency Converter</h1>
-        <div class="converter">
-            <input type="number" id="amount" placeholder="Amount" value="1">
-            <select id="fromCurrency"></select>
-            <select id="toCurrency"></select>
-            <button id="convertBtn">Convert</button>
-        </div>
-        <p id="result"></p>
+  <div class="converter-container">
+    <h1>💰 Currency Converter 💸</h1>
+
+    <!-- Amount Input -->
+    <div class="amount-input">
+      <input type="number" id="amount" placeholder="Enter amount" />
     </div>
 
-    <script src="script.js"></script>
+    <!-- Currency Selection with Search -->
+    <div class="currency-selection">
+      <div class="currency-box">
+        <input type="text" id="fromSearch" class="search-box" placeholder="Search currency...">
+        <select id="fromCurrency"></select>
+      </div>
+      
+      <button id="swapBtn">🔄</button>
+
+      <div class="currency-box">
+        <input type="text" id="toSearch" class="search-box" placeholder="Search currency...">
+        <select id="toCurrency"></select>
+      </div>
+    </div>
+
+    <!-- Date Input for Historical Rates -->
+    <div class="date-selection">
+      <label for="date">📅 Select Date (for historical rates):</label>
+      <input type="date" id="date">
+    </div>
+
+    <!-- Converted Result -->
+    <div class="result">
+      <p id="result"></p>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="hidden">
+      <img src="spinner.gif" alt="Loading...">
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>

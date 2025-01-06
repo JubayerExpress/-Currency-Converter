@@ -1,56 +1,97 @@
-// API for exchange rates
-const API_URL = 'https://api.exchangerate-api.com/v4/latest/USD';
-
-const fromCurrency = document.getElementById('fromCurrency');
-const toCurrency = document.getElementById('toCurrency');
+const fromCurrencySelect = document.getElementById('fromCurrency');
+const toCurrencySelect = document.getElementById('toCurrency');
 const amountInput = document.getElementById('amount');
-const convertBtn = document.getElementById('convertBtn');
-const resultText = document.getElementById('result');
+const resultDisplay = document.getElementById('result');
+const fromSearchInput = document.getElementById('fromSearch');
+const toSearchInput = document.getElementById('toSearch');
+const swapBtn = document.getElementById('swapBtn');
+const dateInput = document.getElementById('date');
+const loadingSpinner = document.getElementById('loading-spinner');
 
-// Fetch exchange rates and populate select options
-async function fetchExchangeRates() {
-    const response = await fetch(API_URL);
-    const data = await response.json();
+const apiKey = 'YOUR_API_KEY'; // Add your API key here (for real-time conversion)
 
-    const currencies = Object.keys(data.rates);
-    populateSelectOptions(currencies);
+// List of available currencies (for demonstration)
+const currencyList = [
+  { code: 'USD', name: 'United States Dollar' },
+  { code: 'EUR', name: 'Euro' },
+  { code: 'GBP', name: 'British Pound' },
+  { code: 'JPY', name: 'Japanese Yen' },
+  { code: 'INR', name: 'Indian Rupee' },
+  { code: 'CAD', name: 'Canadian Dollar' },
+  { code: 'AUD', name: 'Australian Dollar' },
+  // Add more currencies as needed...
+];
+
+// Populate the select elements with currency options
+function populateCurrencyOptions() {
+  currencyList.forEach(currency => {
+    const optionFrom = document.createElement('option');
+    optionFrom.value = currency.code;
+    optionFrom.textContent = `${currency.name} (${currency.code})`;
+
+    const optionTo = document.createElement('option');
+    optionTo.value = currency.code;
+    optionTo.textContent = `${currency.name} (${currency.code})`;
+
+    fromCurrencySelect.appendChild(optionFrom);
+    toCurrencySelect.appendChild(optionTo);
+  });
 }
 
-// Populate currency options in the dropdown
-function populateSelectOptions(currencies) {
-    currencies.forEach(currency => {
-        const option1 = document.createElement('option');
-        const option2 = document.createElement('option');
-        option1.value = option2.value = currency;
-        option1.text = option2.text = currency;
-        fromCurrency.appendChild(option1);
-        toCurrency.appendChild(option2);
-    });
-
-    // Set default selections
-    fromCurrency.value = 'USD';
-    toCurrency.value = 'EUR';
+// Filter currencies by search input
+function filterCurrencies(input, selectElement) {
+  const filter = input.value.toLowerCase();
+  const options = selectElement.querySelectorAll('option');
+  
+  options.forEach(option => {
+    const text = option.textContent.toLowerCase();
+    option.style.display = text.includes(filter) ? '' : 'none';
+  });
 }
 
-// Convert currency
-async function convertCurrency() {
-    const amount = amountInput.value;
-    const from = fromCurrency.value;
-    const to = toCurrency.value;
+// Fetch conversion rates
+async function getConversionRate(fromCurrency, toCurrency, amount, date) {
+  loadingSpinner.classList.remove('hidden');
+  resultDisplay.textContent = '';
 
-    if (amount === '' || isNaN(amount)) {
-        resultText.textContent = 'Please enter a valid amount';
-        return;
-    }
+  let url = `https://api.exchangerate-api.com/v4/latest/${fromCurrency}`;
+  if (date) {
+    url = `https://api.exchangerate-api.com/v4/${date}/${fromCurrency}`;
+  }
 
-    const response = await fetch(`${API_URL}`);
-    const data = await response.json();
-    const rate = data.rates[to] / data.rates[from];
-    const convertedAmount = (amount * rate).toFixed(2);
+  const response = await fetch(url);
+  const data = await response.json();
 
-    resultText.textContent = `${amount} ${from} = ${convertedAmount} ${to}`;
+  loadingSpinner.classList.add('hidden');
+
+  if (data && data.rates[toCurrency]) {
+    const rate = data.rates[toCurrency];
+    const result = (rate * amount).toFixed(2);
+    resultDisplay.textContent = `${amount} ${fromCurrency} = ${result} ${toCurrency}`;
+  } else {
+    resultDisplay.textContent = 'Error retrieving rates.';
+  }
 }
 
-// Event listeners
-convertBtn.addEventListener('click', convertCurrency);
-window.addEventListener('load', fetchExchangeRates);
+// Swap currencies
+swapBtn.addEventListener('click', () => {
+  const temp = fromCurrencySelect.value;
+  fromCurrencySelect.value = toCurrencySelect.value;
+  toCurrencySelect.value = temp;
+});
+
+// Listen for amount or date changes to trigger conversion
+amountInput.addEventListener('input', () => {
+  getConversionRate(fromCurrencySelect.value, toCurrencySelect.value, amountInput.value, dateInput.value);
+});
+
+dateInput.addEventListener('change', () => {
+  getConversionRate(fromCurrencySelect.value, toCurrencySelect.value, amountInput.value, dateInput.value);
+});
+
+// Add search functionality for currencies
+fromSearchInput.addEventListener('input', () => filterCurrencies(fromSearchInput, fromCurrencySelect));
+toSearchInput.addEventListener('input', () => filterCurrencies(toSearchInput, toCurrencySelect));
+
+// Initialize the currency options on page load
+populateCurrencyOptions();

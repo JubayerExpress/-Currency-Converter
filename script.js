@@ -5,12 +5,13 @@ const resultDisplay = document.getElementById('result');
 const fromSearchInput = document.getElementById('fromSearch');
 const toSearchInput = document.getElementById('toSearch');
 const swapBtn = document.getElementById('swapBtn');
+const convertBtn = document.getElementById('convertBtn');
 const dateInput = document.getElementById('date');
 const loadingSpinner = document.getElementById('loading-spinner');
 
 const apiKey = 'YOUR_API_KEY'; // Add your API key here (for real-time conversion)
 
-// List of available currencies (for demonstration)
+// List of world currencies
 const currencyList = [
   { code: 'USD', name: 'United States Dollar' },
   { code: 'EUR', name: 'Euro' },
@@ -19,7 +20,20 @@ const currencyList = [
   { code: 'INR', name: 'Indian Rupee' },
   { code: 'CAD', name: 'Canadian Dollar' },
   { code: 'AUD', name: 'Australian Dollar' },
-  // Add more currencies as needed...
+  { code: 'CNY', name: 'Chinese Yuan' },
+  { code: 'BRL', name: 'Brazilian Real' },
+  { code: 'RUB', name: 'Russian Ruble' },
+  { code: 'MXN', name: 'Mexican Peso' },
+  { code: 'CHF', name: 'Swiss Franc' },
+  { code: 'ZAR', name: 'South African Rand' },
+  { code: 'SGD', name: 'Singapore Dollar' },
+  { code: 'BDT', name: 'Bangladeshi Taka' },
+  { code: 'PKR', name: 'Pakistani Rupee' },
+  { code: 'NGN', name: 'Nigerian Naira' },
+  { code: 'KES', name: 'Kenyan Shilling' },
+  { code: 'EGP', name: 'Egyptian Pound' },
+  { code: 'SAR', name: 'Saudi Riyal' },
+  // Add more currencies...
 ];
 
 // Populate the select elements with currency options
@@ -75,23 +89,28 @@ async function getConversionRate(fromCurrency, toCurrency, amount, date) {
 
 // Swap currencies
 swapBtn.addEventListener('click', () => {
-  const temp = fromCurrencySelect.value;
+  const fromCurrency = fromCurrencySelect.value;
   fromCurrencySelect.value = toCurrencySelect.value;
-  toCurrencySelect.value = temp;
+  toCurrencySelect.value = fromCurrency;
 });
 
-// Listen for amount or date changes to trigger conversion
-amountInput.addEventListener('input', () => {
-  getConversionRate(fromCurrencySelect.value, toCurrencySelect.value, amountInput.value, dateInput.value);
+// Convert button logic
+convertBtn.addEventListener('click', () => {
+  const fromCurrency = fromCurrencySelect.value;
+  const toCurrency = toCurrencySelect.value;
+  const amount = amountInput.value;
+  const date = dateInput.value;
+
+  if (amount && fromCurrency && toCurrency) {
+    getConversionRate(fromCurrency, toCurrency, amount, date);
+  } else {
+    resultDisplay.textContent = 'Please enter all fields correctly.';
+  }
 });
 
-dateInput.addEventListener('change', () => {
-  getConversionRate(fromCurrencySelect.value, toCurrencySelect.value, amountInput.value, dateInput.value);
-});
-
-// Add search functionality for currencies
+// Attach filter events
 fromSearchInput.addEventListener('input', () => filterCurrencies(fromSearchInput, fromCurrencySelect));
 toSearchInput.addEventListener('input', () => filterCurrencies(toSearchInput, toCurrencySelect));
 
-// Initialize the currency options on page load
+// Populate currency options on page load
 populateCurrencyOptions();

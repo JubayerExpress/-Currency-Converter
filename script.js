@@ -1,71 +1,56 @@
-const fromCurrencySelect = document.getElementById('fromCurrencySelect');
-const toCurrencySelect = document.getElementById('toCurrencySelect');
-const amountInput = document.getElementById('amountInput');
-const resultDisplay = document.getElementById('resultDisplay');
+// API for exchange rates
+const API_URL = 'https://api.exchangerate-api.com/v4/latest/USD';
+
+const fromCurrency = document.getElementById('fromCurrency');
+const toCurrency = document.getElementById('toCurrency');
+const amountInput = document.getElementById('amount');
 const convertBtn = document.getElementById('convertBtn');
-const swapBtn = document.getElementById('swapBtn');
+const resultText = document.getElementById('result');
 
-// List of all world currencies
-const currencies = [
-  'USD - US Dollar',
-  'EUR - Euro',
-  'JPY - Japanese Yen',
-  'GBP - British Pound',
-  'AUD - Australian Dollar',
-  'CAD - Canadian Dollar',
-  'CHF - Swiss Franc',
-  'CNY - Chinese Yuan',
-  'INR - Indian Rupee',
-  // Add more currencies here as needed
-];
+// Fetch exchange rates and populate select options
+async function fetchExchangeRates() {
+    const response = await fetch(API_URL);
+    const data = await response.json();
 
-// Populate dropdowns with currency options
-function populateCurrencyOptions() {
-  currencies.forEach(currency => {
-    const option1 = document.createElement('option');
-    const option2 = document.createElement('option');
-    option1.value = currency.split(' ')[0];
-    option1.text = currency;
-    option2.value = currency.split(' ')[0];
-    option2.text = currency;
-
-    fromCurrencySelect.add(option1);
-    toCurrencySelect.add(option2);
-  });
-
-  // Set default selection
-  fromCurrencySelect.value = 'USD';
-  toCurrencySelect.value = 'EUR';
+    const currencies = Object.keys(data.rates);
+    populateSelectOptions(currencies);
 }
 
-// Fetch conversion rate (for simplicity, using mock data here)
-function getConversionRate(fromCurrency, toCurrency, amount) {
-  // Mock conversion rate
-  const rate = 0.85; // Example: 1 USD = 0.85 EUR
+// Populate currency options in the dropdown
+function populateSelectOptions(currencies) {
+    currencies.forEach(currency => {
+        const option1 = document.createElement('option');
+        const option2 = document.createElement('option');
+        option1.value = option2.value = currency;
+        option1.text = option2.text = currency;
+        fromCurrency.appendChild(option1);
+        toCurrency.appendChild(option2);
+    });
 
-  const convertedAmount = (amount * rate).toFixed(2);
-  resultDisplay.textContent = `${amount} ${fromCurrency} = ${convertedAmount} ${toCurrency}`;
+    // Set default selections
+    fromCurrency.value = 'USD';
+    toCurrency.value = 'EUR';
 }
 
-// Swap currencies
-swapBtn.addEventListener('click', () => {
-  const fromCurrency = fromCurrencySelect.value;
-  fromCurrencySelect.value = toCurrencySelect.value;
-  toCurrencySelect.value = fromCurrency;
-});
+// Convert currency
+async function convertCurrency() {
+    const amount = amountInput.value;
+    const from = fromCurrency.value;
+    const to = toCurrency.value;
 
-// Convert button logic
-convertBtn.addEventListener('click', () => {
-  const fromCurrency = fromCurrencySelect.value;
-  const toCurrency = toCurrencySelect.value;
-  const amount = amountInput.value;
+    if (amount === '' || isNaN(amount)) {
+        resultText.textContent = 'Please enter a valid amount';
+        return;
+    }
 
-  if (amount && fromCurrency && toCurrency) {
-    getConversionRate(fromCurrency, toCurrency, amount);
-  } else {
-    resultDisplay.textContent = 'Please enter all fields correctly.';
-  }
-});
+    const response = await fetch(`${API_URL}`);
+    const data = await response.json();
+    const rate = data.rates[to] / data.rates[from];
+    const convertedAmount = (amount * rate).toFixed(2);
 
-// Populate currency options on page load
-populateCurrencyOptions();
+    resultText.textContent = `${amount} ${from} = ${convertedAmount} ${to}`;
+}
+
+// Event listeners
+convertBtn.addEventListener('click', convertCurrency);
+window.addEventListener('load', fetchExchangeRates);

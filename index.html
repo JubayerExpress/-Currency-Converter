@@ -7,49 +7,43 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
   <div class="converter-container">
-    <h1>💰 Currency Converter 💸</h1>
+    <h1>Currency Converter</h1>
 
     <!-- Amount Input -->
     <div class="amount-input">
-      <input type="number" id="amount" placeholder="Enter amount" />
+      <input type="number" id="amountInput" placeholder="Enter amount">
     </div>
 
-    <!-- Currency Selection with Search -->
+    <!-- Currency Selection -->
     <div class="currency-selection">
+      <!-- From Currency Box -->
       <div class="currency-box">
-        <input type="text" id="fromSearch" class="search-box" placeholder="Search currency...">
-        <select id="fromCurrency"></select>
+        <select id="fromCurrencySelect">
+          <!-- Dynamically filled with JS -->
+        </select>
       </div>
-      
-      <button id="swapBtn">🔄</button>
 
+      <!-- Swap Button -->
+      <button id="swapBtn">⇄</button>
+
+      <!-- To Currency Box -->
       <div class="currency-box">
-        <input type="text" id="toSearch" class="search-box" placeholder="Search currency...">
-        <select id="toCurrency"></select>
+        <select id="toCurrencySelect">
+          <!-- Dynamically filled with JS -->
+        </select>
       </div>
-    </div>
-
-    <!-- Date Input for Historical Rates -->
-    <div class="date-selection">
-      <label for="date">📅 Select Date (for historical rates):</label>
-      <input type="date" id="date">
     </div>
 
     <!-- Convert Button -->
     <button id="convertBtn">Convert</button>
 
-    <!-- Converted Result -->
-    <div class="result">
-      <p id="result"></p>
-    </div>
-
-    <!-- Loading Spinner -->
-    <div id="loading-spinner" class="hidden">
-      <img src="spinner.gif" alt="Loading...">
-    </div>
+    <!-- Result Display -->
+    <div id="resultDisplay" class="result"></div>
   </div>
 
   <script src="script.js"></script>
+
 </body>
 </html>
